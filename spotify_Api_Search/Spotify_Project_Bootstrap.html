@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style>
+      .hidden, .hidden2, .hidden3 { display: none; };
+      .jumbotron { height: 200px; };
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header clearfix">
+        <!--     <nav>
+                <ul class="nav nav-pills pull-right">
+                    <li role="presentation" class="active"><a href="#">Home</a></li>
+                    <li role="presentation"><a href="#">About</a></li>
+                    <li role="presentation"><a href="#">Contact</a></li>
+                </ul>
+            </nav> -->
+            <h3 class="text-muted">Spotify Finder 😎</h3>
+        </div>
+<!-- get for a find artist -->
+        <div class="jumbotron" id="search-artists">
+            <h3>Search for an artist...</h3>
+            <form  action="" method="POST" class="form-inline" role="form">
+
+              <div class="form-group">
+                <input type="text" class="form-control" id="" placeholder="Input artist name...">
+              </div>
+
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+<!-- select an artist have found to the list -->
+        <div class="jumbotron hidden" id="select-artist">
+            <h3>Select an artist...</h3>
+            <form action="" method="POST" class="form-inline" role="form">
+              <div class="form-group">
+                <select name="" id="list-artists"></select>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+<!-- show the albums to the selected artits and select one of them -->
+        <div class="jumbotron hidden2" id="select-albums">
+            <h3>Select an album...</h3>
+            <form action="" method="POST" class="form-inline" role="form">
+
+              <div class="form-group">
+                <select name="" id="list-albums"></select>
+              </div>
+
+              <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+<!-- show the tracks to the selected album
+click hearing track -->
+
+        <div class="jumbotron hidden3" id="select-track">
+            <h3>Select a track...</h3>
+            <form action="" method="POST" class="form-inline" role="form">
+              <div class="form-group">
+                <ul id="list-tracks"></ul>
+              </div>
+            </form>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2016 Company, Inc.</p>
+        </footer>
+    </div>
+    <!-- /container -->
+    <script src="https://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <!-- Latest compiled and minified JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script>
+
+      $("#search-artists form").on("submit", function(e) {
+        e.preventDefault();
+        var urlSearch = "https://api.spotify.com/v1/search?type=artist&query=<%ARTIST-NAME%>"
+        var valueSearched = $(this).find("input").val();
+        var urlFilled = urlSearch.replace("<%ARTIST-NAME%>", valueSearched)
+
+        $.ajax({
+          url: urlFilled
+        })
+        .done(function(response) {
+          var listArtists = response.artists.items;
+          var optionsArtists = listArtists.map(function(elem) {
+            return "<option value='" + elem.id + "'>" + elem.name + "</option>"
+          })
+          $("#list-artists").html( optionsArtists.join('') )
+          $("#select-artist").removeClass("hidden")
+        })
+      })
+
+      $("#select-artist form").on("submit", function(e) {
+        e.preventDefault();
+        var urlSearch = "https://api.spotify.com/v1/artists/<%ID-ARTIST%>/albums"
+        var valueSearched = $(this).find("select").val();
+        var urlFilled = urlSearch.replace("<%ID-ARTIST%>", valueSearched)
+
+        $.ajax({
+          url: urlFilled
+        })
+        .done(function(response) {
+          var listAlbums = response.items;
+          var optionsAlbums = listAlbums.map(function(elem) {
+            return "<option value='" + elem.id + "'>" + elem.name + "</option>"
+          })
+          $("#list-albums").html( optionsAlbums.join('') )
+          $("#select-albums").removeClass("hidden2")
+        })
+      })
+
+      $("#select-albums form").on("submit", function(e) {
+        e.preventDefault();
+        var urlSearch = "https://api.spotify.com/v1/albums/<%ID-ALBUM%>/tracks"
+        var valueSearched = $(this).find("select").val();
+        var urlFilled = urlSearch.replace("<%ID-ALBUM%>", valueSearched)
+
+        $.ajax({
+          url: urlFilled
+        })
+        .done(function(response) {
+          var listTracks = response.items;
+          var optionsTracks = listTracks.map(function(elem) {
+            var nameTrack = elem.name
+            //nameTrack = nameTrack.replace('"','')
+            //nameTrack = nameTrack.replace("'","")
+            console.log(nameTrack + " " + elem.preview_url)
+            return "<li><a href='" + elem.preview_url + "'>" + nameTrack + "</a></li>"
+          })
+          $("#list-tracks").html( optionsTracks.join("") )
+          $("#select-track").removeClass("hidden3")
+        })
+      })
+    </script>
+</body>
+
+</html>
